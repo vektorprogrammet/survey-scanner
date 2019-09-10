@@ -5,9 +5,10 @@ import cv2
 import timeit
 import numpy as np
 
-minLineLength = 100
-maxLineLength = 130
-maxLineGap = 10
+minLineLength = 30
+maxLineLength = 50
+maxLineGap = 30
+threshold = 50
 resizeFactor = 0.5
 
 pdf_filename = 'vikhammer.pdf'
@@ -44,9 +45,12 @@ for i, fname in enumerate(image_filenames):
     img = cv2.imread(fname)
     img2 = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     img2 = cv2.resize(img2, (0, 0), fx=resizeFactor, fy=resizeFactor)
-    img2 = cv2.cv2.blur(img2, (3, 3))
     canny = cv2.Canny(img2, 0, 100)
-    lines = cv2.HoughLinesP(canny, 1, np.pi / 360, 30, minLineLength, maxLineGap)
+    dilate_kernel = np.ones((5, 5), np.uint8)
+    dilate = cv2.dilate(canny, dilate_kernel)
+    erode_kernel = np.ones((6, 6), np.uint8)
+    erode = cv2.erode(dilate, erode_kernel)
+    lines = cv2.HoughLinesP(erode, rho=1, theta=np.pi / 180, threshold=50, minLineLength=minLineLength, maxLineGap=maxLineGap)
 
     print('Found %d lines' % len(lines))
     cannyColor = cv2.cvtColor(canny, cv2.COLOR_GRAY2RGB)
