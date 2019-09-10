@@ -55,6 +55,4 @@ for i, fname in enumerate(image_filenames):
             for x1, y1, x2, y2 in line:
                 cv2.line(cannyColor, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-    cv2.imshow('Lines', cannyColor)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    cv2.imwrite('lines.jpg', cannyColor)
