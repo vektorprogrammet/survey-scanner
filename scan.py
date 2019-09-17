@@ -88,7 +88,7 @@ def scan_for_lines(image_filenames):
 
 def scan_for_squares(image_filenames) -> list:
     print('Starting scan_for_lines of %d images' % len(image_filenames))
-    colors = [(0,255,0), (255,0,0), (0,0,255), (255,255,0), (255,0,255)]
+    centers = []
     for i, fname in enumerate(image_filenames):
         print('Scanning %s (%d of %d)' % (fname, i + 1, len(image_filenames)))
         orig = cv2.imread(fname)
@@ -101,25 +101,21 @@ def scan_for_squares(image_filenames) -> list:
         erode = cv2.erode(dilate, erode_kernel)
         contours = cv2.findContours(erode.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         contours = imutils.grab_contours(contours)
-        squares = []
-        areas = []
-        perimeters = []
-        for i, c in enumerate(contours):
+        for c in contours:
             peri = cv2.arcLength(c, True)
             c_approx = cv2.approxPolyDP(c, 0.04 * peri, True)
             if len(c_approx) == 4 \
                     and square_area - area_thresh < cv2.contourArea(c) < square_area + area_thresh\
                     and square_perimeter - perimeter_thresh < peri < square_perimeter + perimeter_thresh:
-                areas.append(cv2.contourArea(c))
-                perimeters.append(peri)
-                squares.append(c)
-                cv2.drawContours(resize, [c_approx], -1, colors[i % len(colors)], 4)
+                cv2.drawContours(resize, [c_approx], -1, (0, 255, 0), 4)
+                moments = cv2.moments(c)
+                center_x = int(moments["m10"] / moments["m00"])
+                center_y = int(moments["m01"] / moments["m00"])
+                centers.append((center_x, center_y))
         cv2.imwrite('contours.jpg', resize)
-
-
-
+    return centers
 
 
 test_image_filenames = ['/tmp/survey/raw/vikhammer.pdf/p2.jpg']  # For testing
 #scan_for_lines(test_image_filenames)
-test_squares = scan_for_squares(test_image_filenames)
+centers = scan_for_squares(test_image_filenames)
