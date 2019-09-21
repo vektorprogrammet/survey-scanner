@@ -1,11 +1,12 @@
 #!/usr/bin/python3
+import json
 import timeit
 from os import makedirs, path
 import cv2
 import numpy as np
 import sys
 from convert import convert_to_jpg
-from scan import scan_for_squares
+from scan import scan_for_squares, scan_for_checks
 from typing import Tuple
 
 
@@ -49,3 +50,11 @@ test_centers = np.float32(test_centers)
 
 flags = cv2.KMEANS_RANDOM_CENTERS
 compactness, labels, means = cv2.kmeans(test_centers, k_centers, None, criteria, 10, flags)
+
+page_dicts = scan_for_checks(test_image_filenames, means)
+print(json.dumps(page_dicts, indent=2))
+box_coordinates = {}
+for box_num, mean in enumerate(means):
+    x, y = mean[0], mean[1]
+    box_coordinates[box_num] = {'x': int(x), 'y': int(y)}
+print(json.dumps(box_coordinates, indent=2))

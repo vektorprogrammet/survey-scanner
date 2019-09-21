@@ -1,16 +1,20 @@
 import cv2
 import numpy as np
 import imutils
-from typing import List
+from typing import List, Dict
 
 resizeFactor = 0.5
 
-square_side = 36.5  # TODO: This value depends on resize factor: this is for 0.5
+square_side = 36.5  # TODO: This value depends on resize factor: this is for 0.5 (also, this is absolute pixel count)
 side_thresh = 10
 square_perimeter = 4 * square_side
 perimeter_thresh = 4 * side_thresh
 square_area = square_side ** 2
 area_thresh = side_thresh ** 2
+
+check_range = 50
+check_thresh = 10
+blank_box_mean = 225
 
 
 def scan_for_squares(image_filenames) -> np.ndarray:
@@ -46,10 +50,18 @@ def scan_for_squares(image_filenames) -> np.ndarray:
     return np.vstack(centers)
 
 
-def scan_for_checks(image_filenames: List[str], centers: np.ndarray):
+def scan_for_checks(image_filenames: List[str], centers: np.ndarray) -> List[Dict]:
     print('Scanning centers for checks in {} files'.format(len(image_filenames)))
-    for i, fname in enumerate(image_filenames):
-        print('Scanning {} ({} of {}):'.format(fname, i + 1, len(image_filenames)), end=' ')
+    page_dicts = []
+    for page_num, fname in enumerate(image_filenames):
+        print('Scanning {} ({} of {}):'.format(fname, page_num + 1, len(image_filenames)))
         orig = cv2.imread(fname)
         resize = cv2.resize(orig, (0, 0), fx=resizeFactor, fy=resizeFactor)
-
+        boxes_dict = {}
+        for center_num, center in enumerate(centers):
+            x, y = center[0], center[1]
+            mean = np.mean(resize[int(y - check_range / 2):int(y + check_range / 2), int(x - check_range / 2):int(x + check_range / 2)])
+            if mean < blank_box_mean - check_thresh:
+                boxes_dict[center_num] = True
+        page_dicts.append({'page': page_num, 'boxes': boxes_dict})
+    return page_dicts
