@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import timeit
 from os import makedirs, path
 import cv2
 import numpy as np
@@ -29,7 +30,12 @@ makedirs(export_dirname, exist_ok=True)
 
 
 test_image_filenames = convert_to_jpg(pdf_filename, export_dirname)
+
+print('Starting scan for boxes.')
+start = timeit.default_timer()
 test_centers = scan_for_squares(test_image_filenames)
+end = timeit.default_timer()
+print('Scanned {} pages in {} seconds.'.format(len(test_image_filenames), int(end - start)))
 
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
 test_centers = np.float32(test_centers)

@@ -13,10 +13,10 @@ area_thresh = side_thresh ** 2
 
 
 def scan_for_squares(image_filenames) -> np.ndarray:
-    print('Starting scan_for_lines of %d images' % len(image_filenames))
+    print('Looking for checkboxes in {} images'.format(len(image_filenames)))
     centers = []
     for i, fname in enumerate(image_filenames):
-        print('Scanning %s (%d of %d)' % (fname, i + 1, len(image_filenames)))
+        print('Scanning {} ({} of {}):'.format(fname, i + 1, len(image_filenames)), end=' ')
         orig = cv2.imread(fname)
         resize = cv2.resize(orig, (0, 0), fx=resizeFactor, fy=resizeFactor)
         img2 = cv2.cvtColor(resize, cv2.COLOR_RGB2GRAY)
@@ -27,6 +27,7 @@ def scan_for_squares(image_filenames) -> np.ndarray:
         erode = cv2.erode(dilate, erode_kernel)
         contours = cv2.findContours(erode.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         contours = imutils.grab_contours(contours)
+        center_count = 0
         for c in contours:
             peri = cv2.arcLength(c, True)
             c_approx = cv2.approxPolyDP(c, 0.04 * peri, True)
@@ -38,5 +39,7 @@ def scan_for_squares(image_filenames) -> np.ndarray:
                 center_x = int(moments["m10"] / moments["m00"])
                 center_y = int(moments["m01"] / moments["m00"])
                 centers.append([center_x, center_y])
+                center_count += 1
         cv2.imwrite('contours.jpg', resize)
+        print('{} boxes'.format(center_count))
     return np.vstack(centers)
