@@ -8,6 +8,7 @@ import sys
 from convert import convert_to_jpg
 from scan import scan_for_squares, scan_for_checks
 from typing import Tuple
+from print import log
 
 
 def get_args() -> Tuple[str, int]:
@@ -17,13 +18,13 @@ def get_args() -> Tuple[str, int]:
         pdf_fname = sys.argv[1]
         k = int(sys.argv[2])
     except (ValueError, IndexError):
-        print("Usage: ./main.py file.pdf k")
+        log("Usage: ./main.py file.pdf k")
         exit(1)
     finally:
         pass
 
     if not path.isfile(pdf_fname):
-        print("{} is not a valid file".format(pdf_fname))
+        log("{} is not a valid file".format(pdf_fname))
         exit(1)
 
     return pdf_fname, k
@@ -31,7 +32,7 @@ def get_args() -> Tuple[str, int]:
 
 (pdf_filename, k_centers) = get_args()
 
-print("Starting survey scan of {}. Looking for {} boxes.". format(pdf_filename, k_centers))
+log("Starting survey scan of {}. Looking for {} boxes.". format(pdf_filename, k_centers))
 
 export_dirname = '/tmp/survey/raw/%s' % pdf_filename
 makedirs(export_dirname, exist_ok=True)
@@ -39,11 +40,11 @@ makedirs(export_dirname, exist_ok=True)
 
 test_image_filenames = convert_to_jpg(pdf_filename, export_dirname)
 
-print('Starting scan for boxes.')
+log('Starting scan for boxes.')
 start = timeit.default_timer()
 test_centers = scan_for_squares(test_image_filenames)
 end = timeit.default_timer()
-print('Scanned {} pages in {} seconds.'.format(len(test_image_filenames), int(end - start)))
+log('Scanned {} pages in {} seconds.'.format(len(test_image_filenames), int(end - start)))
 
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
 test_centers = np.float32(test_centers)

@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import imutils
 from typing import List, Dict
+from print import log
 
 resizeFactor = 0.5
 
@@ -18,10 +19,10 @@ blank_box_mean = 225
 
 
 def scan_for_squares(image_filenames) -> np.ndarray:
-    print('Looking for checkboxes in {} images'.format(len(image_filenames)))
+    log('Looking for checkboxes in {} images'.format(len(image_filenames)))
     centers = []
     for i, fname in enumerate(image_filenames):
-        print('Scanning {} ({} of {}):'.format(fname, i + 1, len(image_filenames)), end=' ')
+        log('Scanning {} ({} of {}):'.format(fname, i + 1, len(image_filenames)), end=' ')
         orig = cv2.imread(fname)
         resize = cv2.resize(orig, (0, 0), fx=resizeFactor, fy=resizeFactor)
         img2 = cv2.cvtColor(resize, cv2.COLOR_RGB2GRAY)
@@ -46,15 +47,15 @@ def scan_for_squares(image_filenames) -> np.ndarray:
                 centers.append([center_x, center_y])
                 center_count += 1
         cv2.imwrite('contours.jpg', resize)
-        print('{} boxes'.format(center_count))
+        log('{} boxes'.format(center_count))
     return np.vstack(centers)
 
 
 def scan_for_checks(image_filenames: List[str], centers: np.ndarray) -> List[Dict]:
-    print('Scanning centers for checks in {} files'.format(len(image_filenames)))
+    log('Scanning centers for checks in {} files'.format(len(image_filenames)))
     page_dicts = []
     for page_num, fname in enumerate(image_filenames):
-        print('Scanning {} ({} of {}):'.format(fname, page_num + 1, len(image_filenames)))
+        log('Scanning {} ({} of {}):'.format(fname, page_num + 1, len(image_filenames)))
         orig = cv2.imread(fname)
         resize = cv2.resize(orig, (0, 0), fx=resizeFactor, fy=resizeFactor)
         boxes_dict = {}
