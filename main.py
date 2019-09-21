@@ -53,9 +53,9 @@ flags = cv2.KMEANS_RANDOM_CENTERS
 compactness, labels, means = cv2.kmeans(test_centers, k_centers, None, criteria, 10, flags)
 
 page_dicts = scan_for_checks(test_image_filenames, means)
-print(json.dumps(page_dicts, indent=2))
+print(json.dumps(page_dicts, indent=2, sort_keys=True))
 box_coordinates = {}
 for box_num, mean in enumerate(means):
     x, y = mean[0], mean[1]
     box_coordinates[box_num] = {'x': int(x), 'y': int(y)}
-print(json.dumps(box_coordinates, indent=2))
+print(json.dumps(box_coordinates, indent=2, sort_keys=True))
