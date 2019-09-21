@@ -6,22 +6,29 @@ import numpy as np
 import sys
 from convert import convert_to_jpg
 from scan import scan_for_squares
+from typing import Tuple
 
 
-pdf_filename = ""
-k_centers = 0
-try:
-    pdf_filename = sys.argv[1]
-    k_centers = int(sys.argv[2])
-except (ValueError, IndexError):
-    print("Usage: ./main.py file.pdf k")
-    exit(1)
-finally:
-    pass
+def get_args() -> Tuple[str, int]:
+    pdf_fname = ""
+    k = 0
+    try:
+        pdf_fname = sys.argv[1]
+        k = int(sys.argv[2])
+    except (ValueError, IndexError):
+        print("Usage: ./main.py file.pdf k")
+        exit(1)
+    finally:
+        pass
 
-if not path.isfile(pdf_filename):
-    print("{} is not a valid file".format(pdf_filename))
-    exit(1)
+    if not path.isfile(pdf_fname):
+        print("{} is not a valid file".format(pdf_fname))
+        exit(1)
+
+    return pdf_fname, k
+
+
+(pdf_filename, k_centers) = get_args()
 
 print("Starting survey scan of {}. Looking for {} boxes.". format(pdf_filename, k_centers))
 

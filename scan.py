@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import imutils
+from typing import List
 
 resizeFactor = 0.5
 
@@ -43,3 +44,12 @@ def scan_for_squares(image_filenames) -> np.ndarray:
         cv2.imwrite('contours.jpg', resize)
         print('{} boxes'.format(center_count))
     return np.vstack(centers)
+
+
+def scan_for_checks(image_filenames: List[str], centers: np.ndarray):
+    print('Scanning centers for checks in {} files'.format(len(image_filenames)))
+    for i, fname in enumerate(image_filenames):
+        print('Scanning {} ({} of {}):'.format(fname, i + 1, len(image_filenames)), end=' ')
+        orig = cv2.imread(fname)
+        resize = cv2.resize(orig, (0, 0), fx=resizeFactor, fy=resizeFactor)
+
