@@ -13,7 +13,7 @@ The scanner takes a single pdf file and a number of expected boxes (`k`) as inpu
 ```
 
 ### Outputs: stdout, stderr
-The outputs are written to `stdout` but beware, the program logs to `stderr`.
+The outputs are written to `stdout` but beware, the program logs its progress to `stderr`.
 To suppress the log outputs or write them to a specific file, you can do
 ```bash
 ./main.py inputs.pdf k 2>/path/to/log  # Write to log file

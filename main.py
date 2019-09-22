@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import json
 import timeit
+import uuid
 from os import makedirs, path
 import cv2
 import numpy as np
@@ -34,11 +35,13 @@ def get_args() -> Tuple[str, int]:
 
 log("Starting survey scan of {}. Looking for {} boxes.". format(pdf_filename, k_centers))
 
-export_dirname = '/tmp/survey/raw/%s' % pdf_filename
-makedirs(export_dirname, exist_ok=True)
+export_dirname = '/tmp/survey/{}'.format(uuid.uuid4())
+makedirs(export_dirname)
 
 
-test_image_filenames = convert_to_jpg(pdf_filename, export_dirname)
+raw_folder = '{}/raw'.format(export_dirname)
+makedirs(raw_folder)
+test_image_filenames = convert_to_jpg(pdf_filename, raw_folder)
 
 log('Starting scan for boxes.')
 start = timeit.default_timer()
@@ -53,9 +56,10 @@ flags = cv2.KMEANS_RANDOM_CENTERS
 compactness, labels, means = cv2.kmeans(test_centers, k_centers, None, criteria, 10, flags)
 
 page_dicts = scan_for_checks(test_image_filenames, means)
-print(json.dumps(page_dicts, indent=2, sort_keys=True))
 box_coordinates = {}
 for box_num, mean in enumerate(means):
     x, y = mean[0], mean[1]
     box_coordinates[box_num] = {'x': int(x), 'y': int(y)}
-print(json.dumps(box_coordinates, indent=2, sort_keys=True))
+
+output = {'boxes': box_coordinates, 'pages': page_dicts, 'images_folder': export_dirname}
+print(json.dumps(output, indent=2, sort_keys=True))
