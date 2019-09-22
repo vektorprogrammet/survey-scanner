@@ -54,6 +54,13 @@ test_centers = np.float32(test_centers)
 
 flags = cv2.KMEANS_RANDOM_CENTERS
 compactness, labels, means = cv2.kmeans(test_centers, k_centers, None, criteria, 10, flags)
+# TODO: Fix k means
+# Too many means are placed on top of a few boxes, likely because those boxes get detected the most.
+# We can do a second pass, where we first go over the test_centers array, and remove all points that already
+# correspond to a mean (within some threshold)
+# For the means, we remove any duplicates. (take the mean of any means that overlap)
+# We will then be left with a number of means that is less than k (37). This difference will be our new k
+# Run k-means once more with the new k and combine with the old means
 
 
 marked_dir = '{}/marked'.format(export_dirname)
