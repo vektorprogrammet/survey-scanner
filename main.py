@@ -39,9 +39,9 @@ export_dirname = '/tmp/survey/{}'.format(uuid.uuid4())
 makedirs(export_dirname)
 
 
-raw_folder = '{}/raw'.format(export_dirname)
-makedirs(raw_folder)
-test_image_filenames = convert_to_jpg(pdf_filename, raw_folder)
+raw_dir = '{}/raw'.format(export_dirname)
+makedirs(raw_dir)
+test_image_filenames = convert_to_jpg(pdf_filename, raw_dir)
 
 log('Starting scan for boxes.')
 start = timeit.default_timer()
@@ -55,7 +55,10 @@ test_centers = np.float32(test_centers)
 flags = cv2.KMEANS_RANDOM_CENTERS
 compactness, labels, means = cv2.kmeans(test_centers, k_centers, None, criteria, 10, flags)
 
-page_dicts = scan_for_checks(test_image_filenames, means)
+
+marked_dir = '{}/marked'.format(export_dirname)
+makedirs(marked_dir)
+page_dicts = scan_for_checks(test_image_filenames, means, marked_dir)
 box_coordinates = {}
 for box_num, mean in enumerate(means):
     x, y = mean[0], mean[1]

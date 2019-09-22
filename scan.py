@@ -17,6 +17,9 @@ check_range = 50
 check_thresh = 10
 blank_box_mean = 225
 
+circle_radius = 35
+color_green = (0, 255, 0)
+
 
 def scan_for_squares(image_filenames) -> np.ndarray:
     log('Looking for checkboxes in {} images'.format(len(image_filenames)))
@@ -40,7 +43,7 @@ def scan_for_squares(image_filenames) -> np.ndarray:
             if len(c_approx) == 4 \
                     and square_area - area_thresh < cv2.contourArea(c) < square_area + area_thresh \
                     and square_perimeter - perimeter_thresh < peri < square_perimeter + perimeter_thresh:
-                cv2.drawContours(resize, [c_approx], -1, (0, 255, 0), 4)
+                cv2.drawContours(resize, [c_approx], -1, color_green, 4)
                 moments = cv2.moments(c)
                 center_x = int(moments["m10"] / moments["m00"])
                 center_y = int(moments["m01"] / moments["m00"])
@@ -51,7 +54,7 @@ def scan_for_squares(image_filenames) -> np.ndarray:
     return np.vstack(centers)
 
 
-def scan_for_checks(image_filenames: List[str], centers: np.ndarray) -> List[Dict]:
+def scan_for_checks(image_filenames: List[str], centers: np.ndarray, export_dir) -> List[Dict]:
     log('Scanning centers for checks in {} files'.format(len(image_filenames)))
     page_dicts = []
     for page_num, fname in enumerate(image_filenames):
@@ -64,5 +67,7 @@ def scan_for_checks(image_filenames: List[str], centers: np.ndarray) -> List[Dic
             mean = np.mean(resize[int(y - check_range / 2):int(y + check_range / 2), int(x - check_range / 2):int(x + check_range / 2)])
             if mean < blank_box_mean - check_thresh:
                 boxes_dict[center_num] = True
+                cv2.circle(resize, (x, y), circle_radius, color_green, thickness=3)
         page_dicts.append({'page': page_num, 'boxes': boxes_dict})
+        cv2.imwrite('{}/{}.jpg'.format(export_dir, str(page_num)), resize)
     return page_dicts
