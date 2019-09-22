@@ -49,7 +49,6 @@ def scan_for_squares(image_filenames) -> np.ndarray:
                 center_y = int(moments["m01"] / moments["m00"])
                 centers.append([center_x, center_y])
                 center_count += 1
-        cv2.imwrite('contours.jpg', resize)
         log('{} boxes'.format(center_count))
     return np.vstack(centers)
 
