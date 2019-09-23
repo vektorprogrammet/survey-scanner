@@ -69,6 +69,10 @@ When the boxes are detected, they are approximated by a 4 edged polygon which ha
 Big check marks that go outside the box boundaries often trip this detection up, meaning that for every page, a few boxes go undetected.
 To mitigate this, the program takes into account all the pages when determining where the boxes are, and hence the pdf must be of some size before we can ensure that all boxes are detected.
 
+## Results
+The system correctly identifies checked boxes.
+
+![Results](detections.png "Results")
 
 ## HoughLines vs contours
 
