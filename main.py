@@ -10,6 +10,8 @@ from convert import convert_to_jpg
 from scan import scan_for_squares, scan_for_checks
 from typing import Tuple
 from print import log
+from kmeans import merge_overlapping_means, remove_around_means
+from draw import draw_point_sets
 
 
 def get_args() -> Tuple[str, int]:
@@ -49,7 +51,7 @@ test_centers = scan_for_squares(test_image_filenames)
 end = timeit.default_timer()
 log('Scanned {} pages in {} seconds.'.format(len(test_image_filenames), int(end - start)))
 
-criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 0.1)
 test_centers = np.float32(test_centers)
 
 flags = cv2.KMEANS_RANDOM_CENTERS
@@ -65,9 +67,11 @@ compactness, labels, means = cv2.kmeans(test_centers, k_centers, None, criteria,
 
 marked_dir = '{}/marked'.format(export_dirname)
 makedirs(marked_dir)
-page_dicts = scan_for_checks(test_image_filenames, means, marked_dir)
+unique_means = np.array(merge_overlapping_means(means, 10**2)).astype(int)
+draw_point_sets([test_centers, means, unique_means], test_image_filenames[0], "{}/means.jpg".format(export_dirname), [(255, 200, 200), (200, 200, 255), (50, 50, 230)])
+page_dicts = scan_for_checks(test_image_filenames, unique_means, marked_dir)
 box_coordinates = {}
-for box_num, mean in enumerate(means):
+for box_num, mean in enumerate(unique_means):
     x, y = mean[0], mean[1]
     box_coordinates[box_num] = {'x': int(x), 'y': int(y)}
 
