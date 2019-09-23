@@ -55,7 +55,7 @@ criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 0.1)
 test_centers = np.float32(test_centers)
 
 flags = cv2.KMEANS_RANDOM_CENTERS
-compactness, labels, means = cv2.kmeans(test_centers, k_centers, None, criteria, 10, flags)
+unique_means = np.array(merge_overlapping_means(test_centers, 10**2)).astype(int)
 # TODO: Fix k means
 # Too many means are placed on top of a few boxes, likely because those boxes get detected the most.
 # We can do a second pass, where we first go over the test_centers array, and remove all points that already
@@ -67,8 +67,7 @@ compactness, labels, means = cv2.kmeans(test_centers, k_centers, None, criteria,
 
 marked_dir = '{}/marked'.format(export_dirname)
 makedirs(marked_dir)
-unique_means = np.array(merge_overlapping_means(means, 10**2)).astype(int)
-draw_point_sets([test_centers, means, unique_means], test_image_filenames[0], "{}/means.jpg".format(export_dirname), [(255, 200, 200), (200, 200, 255), (50, 50, 230)])
+draw_point_sets([test_centers, unique_means], test_image_filenames[0], "{}/means.jpg".format(export_dirname), [(255, 200, 200), (50, 50, 230)])
 page_dicts = scan_for_checks(test_image_filenames, unique_means, marked_dir)
 box_coordinates = {}
 for box_num, mean in enumerate(unique_means):

@@ -15,7 +15,7 @@ area_thresh = side_thresh ** 2
 
 check_range = 50
 check_thresh = 10
-blank_box_mean = 225
+blank_box_mean = 103
 
 circle_radius = 35
 color_green = (0, 255, 0)
@@ -60,11 +60,15 @@ def scan_for_checks(image_filenames: List[str], centers: np.ndarray, export_dir)
         log('Scanning {} ({} of {}):'.format(fname, page_num + 1, len(image_filenames)))
         orig = cv2.imread(fname)
         resize = cv2.resize(orig, (0, 0), fx=resizeFactor, fy=resizeFactor)
+        grey = cv2.cvtColor(resize, cv2.COLOR_RGB2GRAY)
+        canny = cv2.Canny(grey, 0, 100)
+        dilate_kernel = np.ones((5, 5), np.uint8)
+        dilate = cv2.dilate(canny, dilate_kernel)
         boxes_dict = {}
         for center_num, center in enumerate(centers):
             x, y = center[0], center[1]
-            mean = np.mean(resize[int(y - check_range / 2):int(y + check_range / 2), int(x - check_range / 2):int(x + check_range / 2)])
-            if mean < blank_box_mean - check_thresh:
+            mean = np.mean(dilate[int(y - check_range / 2):int(y + check_range / 2), int(x - check_range / 2):int(x + check_range / 2)])
+            if mean > blank_box_mean + check_thresh:
                 boxes_dict[center_num] = True
                 cv2.circle(resize, (x, y), circle_radius, color_green, thickness=3)
         page_dicts.append({'page': page_num, 'boxes': boxes_dict})
