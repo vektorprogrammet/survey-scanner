@@ -22,9 +22,9 @@ To suppress the log outputs or write them to a specific file, you can do
 
 
 ## Output data structure
-The data that comes out of the program is json formatted.
+The data that comes out of the program is json formatted. It is a single json object, containing three lists, "boxes", "image_folder" and "pages". The image folder is the folder where images are placed.
 It outputs a list of checkboxes it has found, with ids and coordinates. e.g.
-#### Box coordinates
+#### Box coordinates ("boxes")
 ```json
 {
   "0": {
@@ -42,7 +42,7 @@ It outputs a list of checkboxes it has found, with ids and coordinates. e.g.
 }
 ```
 In addition, a list of all the pages, with corresponding lists of their checked boxes are outputted. e.g.
-#### Pages
+#### Pages ("pages")
 ```json
 [
   {
