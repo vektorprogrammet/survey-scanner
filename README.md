@@ -7,7 +7,7 @@ pip install all the needed packages
 
 ## Usage
 ### Running the program
-The scanner takes a single pdf file and a number of expected boxes (`k`) as inputs.
+The scanner takes a single pdf file and a number of expected boxes (`k`) as inputs. Note: k has no real effect.
 ```bash
 ./main.py inputs.pdf k
 ```
